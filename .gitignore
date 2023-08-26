@@ -1,0 +1,39 @@
+# Python
+*.pyc
+__pycache__/
+venv/
+*.pyproj
+*.sublime-project
+*.sublime-workspace
+
+# Django
+*.log
+*.pot
+*.pyc
+local_settings.py
+db.sqlite3
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Compiled/Build Files
+*.pyd
+*.pyo
+*.pyc
+*.so
+*.dll
+*.exe
+*.msi
+*.egg-info/
+dist/
+build/
+*.egg
+*.egg-info
+
+# OS
+.DS_Store
+Thumbs.db
+.env

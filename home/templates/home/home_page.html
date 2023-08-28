@@ -2,7 +2,9 @@
 
 <!-- load wagtailcore_tags by adding this: -->
 {% load wagtailcore_tags %}
-
+{% block branding_favicon %}
+    <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" />
+{% endblock %}
 {% block body_class %}template-homepage{% endblock %}
 
 <!-- replace everything below with: -->

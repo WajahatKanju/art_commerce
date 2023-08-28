@@ -151,7 +151,7 @@ MEDIA_URL = "/media/"
 
 # Wagtail settings
 
-WAGTAIL_SITE_NAME = "core"
+WAGTAIL_SITE_NAME = "Art Mart"
 
 # Search
 # https://docs.wagtail.org/en/stable/topics/search/backends.html

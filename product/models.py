@@ -5,30 +5,70 @@ The Product app includes models for managing product categories and individual p
 
 Models:
 - Category: Represents a product category.
-- Product: Represents an individual product, including its name, description, price,\
+- Brand: Represents a product brand.
+- Product: Represents an individual product, including its name, description, price,
   stock quantity, and category.
+- ProductImage: Represents an image associated with a product.
+- ProductVideo: Represents a video associated with a product.
+- Color: Represents a color.
+- Attribute: Represents an attribute.
+- ProductVariation: Represents a product variation.
+- ProductPrice: Represents the price information for a product variation.
 
-Each model provides a user-friendly string representation for use in the admin panel\
-  and other contexts.
+Each model provides a user-friendly string representation for use in the admin panel
+and other contexts.
 
-Example:
-    To create a new product category, you can use the Category model\
-        as follows:
-    >>> category = Category.objects.create(name="Electronics")
-    To create a new product Brand, you can use the Brand model\
-        as follows:
-    >>> brand = Brand.objects.create(name="nike")
-    To create a new product belonging to a category, you can use the Product model\
-        as follows:
-    >>> product = Product.objects.create(
-    ...     name="Smartphone",
-    ...     description="A high-end smartphone with advanced features.",
-    ...     price=799.99,
-    ...     stock_quantity=100,
-    ...     category=category
-    ... )
+Example Usage:
+To create a new product category, you can use the Category model as follows:
+>>> category = Category.objects.create(name="Electronics")
+
+To create a new product brand, you can use the Brand model as follows:
+>>> brand = Brand.objects.create(name="nike")
+
+To create a new product belonging to a category, you can use the Product model as\
+    follows:
+>>> product = Product.objects.create(
+...     product_name="Smartphone",
+...     category=category,
+...     brand=brand,
+...     weight=0.2,  # Weight in kilograms
+...     min_purchase_qty=10,
+...     tags=["electronics", "smartphone"],
+...     barcode="123456789",
+...     refundable=True,
+...     description="A high-end smartphone with advanced features."
+... )
+
+To add an image to a product, you can use the ProductImage model as follows:
+>>> image = ProductImage.objects.create(
+...     product=product,
+...     is_thumbnail=True,
+...     image="path/to/your/image.jpg"
+... )
+
+To add a video to a product, you can use the ProductVideo model as follows:
+>>> video_provider = VideoProvider.objects.create(name="YouTube")
+>>> video = ProductVideo.objects.create(
+...     product=product,
+...     video_provider=video_provider,
+...     video_link="https://www.youtube.com/watch?v=your_video_id"
+... )
+
+To define available colors and attributes for a product variation, you can use the
+ProductVariation model as follows:
+>>> variation = ProductVariation.objects.create(product=product)
+>>> variation.colors.add(color1, color2)  # Add available colors
+>>> variation.attributes.add(attribute1, attribute2)  # Add available attributes
+
+To set the price and discount information for a product variation, you can use the
+ProductPrice model as follows:
+>>> price = ProductPrice.objects.create(product_variation=variation, unit_price=599.99)
+>>> price.attributes.add(attribute1, attribute2)  # Add associated attributes
+>>> price.discount_start_date = "2023-01-01"  # Set discount start date
+>>> price.discount_end_date = "2023-01-15"  # Set discount end date
+>>> price.discount = 10.0  # Set discount percentage
+>>> price.save()
 """
-
 from django.db import models
 from taggit.managers import TaggableManager
 

@@ -28,7 +28,7 @@ To create a new product brand, you can use the Brand model as follows:
 To create a new product belonging to a category, you can use the Product model as\
     follows:
 >>> product = Product.objects.create(
-...     product_name="Smartphone",
+...     name="Smartphone",
 ...     category=category,
 ...     brand=brand,
 ...     weight=0.2,  # Weight in kilograms
@@ -71,6 +71,7 @@ ProductPrice model as follows:
 """
 from django.db import models
 from taggit.managers import TaggableManager
+from wagtail.snippets.models import register_snippet
 
 
 class Brand(models.Model):
@@ -79,6 +80,8 @@ class Brand(models.Model):
     """
 
     name = models.CharField(max_length=100)
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -90,6 +93,8 @@ class Category(models.Model):
     """
 
     name = models.CharField(max_length=100)
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
 
     class Meta:
         """
@@ -106,7 +111,9 @@ class Category(models.Model):
 
 
 class VideoProvider(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=20)
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -118,7 +125,7 @@ class Product(models.Model):
     """
 
     # Product Information
-    product_name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
 
@@ -139,6 +146,9 @@ class Product(models.Model):
     # Product Description
     description = models.TextField(blank=True, null=True)
 
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
+
     class Meta:
         """
         Meta options for the Product model.
@@ -150,7 +160,7 @@ class Product(models.Model):
         verbose_name_plural = "Products"
 
     def __str__(self):
-        return f"{self.product_name}"
+        return f"{self.name}"
 
 
 class ProductImage(models.Model):
@@ -159,9 +169,13 @@ class ProductImage(models.Model):
     )
     is_thumbnail = models.BooleanField()
     image = models.ImageField(upload_to="product_images/")
+    description = models.TextField(max_length=12)
+
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
 
     def __str__(self):
-        return f"Image for {self.product.product_name}"
+        return f"Image for {self.product}"
 
 
 class ProductVideo(models.Model):
@@ -170,12 +184,16 @@ class ProductVideo(models.Model):
     )
     video_provider = models.ForeignKey(VideoProvider, on_delete=models.CASCADE)
     video_link = models.URLField(max_length=255, blank=True, null=True)
+
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
     # You can add other fields like a caption or description for the image if needed
 
     def __str__(self):
         return f"{self.video_provider}: {self.video_link}"
 
 
+@register_snippet
 class Color(models.Model):
     name = models.CharField(max_length=12)
     color_code = models.CharField(verbose_name="Hexadecimal Color Code", max_length=8)
@@ -184,17 +202,28 @@ class Color(models.Model):
         return f"{self.name}"
 
 
+@register_snippet
 class Attribute(models.Model):
     name = models.CharField(max_length=15)
+    created_at = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.name}"
 
 
 class ProductVariation(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    colors = models.ManyToManyField(Color, verbose_name="Available Colors")
-    attributes = models.ManyToManyField(Attribute, verbose_name="Available Attributes")
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name="variations",
+    )
+    colors = models.ManyToManyField(
+        Color, verbose_name="Available Colors", related_name="colors"
+    )
+    attributes = models.ManyToManyField(
+        Attribute, verbose_name="Available Attributes", related_name="attributes"
+    )
+    created_at = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return f"ProductVariation ID: {self.pk}"
@@ -202,7 +231,6 @@ class ProductVariation(models.Model):
 
 class ProductPrice(models.Model):
     product_variation = models.ForeignKey(ProductVariation, on_delete=models.CASCADE)
-    attributes = models.ManyToManyField(Attribute, verbose_name="Attributes")
     unit_price = models.DecimalField(
         max_digits=10, decimal_places=2, blank=True, null=True
     )
@@ -211,6 +239,8 @@ class ProductPrice(models.Model):
     discount = models.DecimalField(
         max_digits=5, decimal_places=2, blank=True, null=True
     )
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
 
     def __str__(self):
         return f"Price for ProductVariation ID: {self.product_variation}"

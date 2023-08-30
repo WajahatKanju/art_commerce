@@ -181,17 +181,7 @@ class ProductVariationAdmin(ModelAdmin):
     menu_label = "Product Variation"
     menu_icon = "spinner"
 
-    list_display = ("product", "get_colors", "get_attributes", "created_at")
-
-    def get_colors(self, obj):
-        return ", ".join([color.name for color in obj.colors.all()])
-
-    get_colors.short_description = "Available Colors"
-
-    def get_attributes(self, obj):
-        return ", ".join([attr.name for attr in obj.attributes.all()])
-
-    get_attributes.short_description = "Available Attributes"
+    list_display = ("product", "attributes", "attribute_value", "created_at")
 
 
 class ProductPriceAdmin(ModelAdmin):

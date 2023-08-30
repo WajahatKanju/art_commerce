@@ -10,7 +10,6 @@ Models:
   stock quantity, and category.
 - ProductImage: Represents an image associated with a product.
 - ProductVideo: Represents a video associated with a product.
-- Color: Represents a color.
 - Attribute: Represents an attribute.
 - ProductVariation: Represents a product variation.
 - ProductPrice: Represents the price information for a product variation.
@@ -54,10 +53,9 @@ To add a video to a product, you can use the ProductVideo model as follows:
 ...     video_link="https://www.youtube.com/watch?v=your_video_id"
 ... )
 
-To define available colors and attributes for a product variation, you can use the
+To define available attributes for a product variation, you can use the
 ProductVariation model as follows:
 >>> variation = ProductVariation.objects.create(product=product)
->>> variation.colors.add(color1, color2)  # Add available colors
 >>> variation.attributes.add(attribute1, attribute2)  # Add available attributes
 
 To set the price and discount information for a product variation, you can use the
@@ -143,6 +141,8 @@ class Product(models.Model):
     barcode = models.CharField(max_length=50, blank=True, null=True)
     refundable = models.BooleanField(default=False)
 
+    base_price = models.DecimalField(max_digits=8, decimal_places=2)
+
     # Product Description
     description = models.TextField(blank=True, null=True)
 
@@ -194,15 +194,6 @@ class ProductVideo(models.Model):
 
 
 @register_snippet
-class Color(models.Model):
-    name = models.CharField(max_length=12)
-    color_code = models.CharField(verbose_name="Hexadecimal Color Code", max_length=8)
-
-    def __str__(self):
-        return f"{self.name}"
-
-
-@register_snippet
 class Attribute(models.Model):
     name = models.CharField(max_length=15)
     created_at = models.DateField(auto_now_add=True)
@@ -211,17 +202,30 @@ class Attribute(models.Model):
         return f"{self.name}"
 
 
+@register_snippet
+class AttributeValue(models.Model):
+    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
+    value = models.CharField(max_length=15)
+
+    def __str__(self):
+        return self.value
+
+
 class ProductVariation(models.Model):
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
         related_name="variations",
     )
-    colors = models.ManyToManyField(
-        Color, verbose_name="Available Colors", related_name="colors"
+    attributes = models.ForeignKey(
+        Attribute,
+        related_name="attribute",
+        on_delete=models.CASCADE,
     )
-    attributes = models.ManyToManyField(
-        Attribute, verbose_name="Available Attributes", related_name="attributes"
+    attribute_value = models.ForeignKey(
+        AttributeValue,
+        related_name="attribute_values",
+        on_delete=models.CASCADE,
     )
     created_at = models.DateField(auto_now_add=True)
 
